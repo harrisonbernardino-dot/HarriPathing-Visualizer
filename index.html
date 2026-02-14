@@ -2,456 +2,366 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>HarriPath V3 - Mission Editor</title>
+    <title>HarriPath Visualizer</title>
     <style>
-        :root { --bg: #1e1e1e; --panel: #252526; --text: #d4d4d4; --accent: #007acc; --danger: #d32f2f; --success: #4caf50; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; margin: 0; overflow: hidden; }
-        
-        /* Layout */
-        #canvas-container { flex: 1; display: flex; justify-content: center; align-items: center; background: radial-gradient(#333 1px, transparent 1px); background-size: 20px 20px; position: relative; }
-        canvas { background: #333; box-shadow: 0 0 30px rgba(0,0,0,0.6); cursor: crosshair; border: 2px solid #444; }
-        
-        /* Sidebar */
-        #sidebar { width: 340px; background: var(--panel); padding: 15px; display: flex; flex-direction: column; border-left: 1px solid #000; overflow-y: auto; box-shadow: -5px 0 15px rgba(0,0,0,0.3); }
-        
-        h2 { color: var(--accent); margin-top: 0; display: flex; justify-content: space-between; align-items: center; }
-        .version { font-size: 0.8rem; background: #333; padding: 2px 6px; border-radius: 4px; color: #888; }
+        :root {
+            --bg-color: #1e1e1e;
+            --panel-color: #252526;
+            --text-color: #d4d4d4;
+            --accent-color: #007acc;
+            --grid-line: #3e3e42;
+            --highlight: #4caf50;
+        }
 
-        /* Controls */
-        .control-group { background: #333; padding: 10px; border-radius: 6px; margin-bottom: 10px; border-left: 3px solid var(--accent); }
-        .control-group h4 { margin: 0 0 8px 0; color: #fff; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
-        
-        label { display: block; margin-bottom: 4px; font-size: 0.85rem; color: #aaa; }
-        select, input[type="number"] { width: 100%; background: #222; border: 1px solid #555; color: white; padding: 6px; margin-bottom: 8px; border-radius: 4px; box-sizing: border-box; }
-        select:focus, input:focus { border-color: var(--accent); outline: none; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-        /* Buttons */
-        .btn-row { display: flex; gap: 5px; margin-top: 5px; }
-        button { flex: 1; padding: 10px; background: var(--accent); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
-        button:hover { filter: brightness(1.1); }
-        button.red { background: var(--danger); }
-        button.secondary { background: #444; }
-        
-        /* Text Area */
-        textarea { width: 100%; height: 180px; background: #151515; color: #9cdcfe; border: 1px solid #444; font-family: 'Consolas', monospace; font-size: 0.85rem; padding: 8px; resize: vertical; box-sizing: border-box; }
+        /* Área do Campo (Esquerda) */
+        #canvas-container {
+            flex: 1;
+            display: flex;
+            justify_content: center;
+            align-items: center;
+            position: relative;
+            background-image: radial-gradient(#333 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
 
-        /* Stats & Info */
-        .info-bar { font-size: 0.8rem; color: #aaa; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 10px; }
-        .info-val { color: #fff; font-family: monospace; }
-        
-        /* Hidden Elements */
-        .hidden { display: none; }
+        canvas {
+            background-color: #333;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            cursor: crosshair;
+            background-size: cover;
+            /* Imagem de fundo da temporada atual (Into the Deep) ou genérica */
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/5c/Grey_square.jpg'); 
+        }
+
+        /* Painel de Controle (Direita) */
+        #sidebar {
+            width: 350px;
+            background-color: var(--panel-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid #000;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+        }
+
+        h1 { margin-top: 0; font-size: 1.5rem; color: var(--accent-color); }
+        h3 { border-bottom: 1px solid #555; padding-bottom: 5px; margin-top: 20px; }
+
+        .control-group {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input[type="number"] {
+            width: 60px;
+            padding: 5px;
+            background: #3c3c3c;
+            border: 1px solid #555;
+            color: white;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        button:hover { background-color: #005f9e; }
+        button.secondary { background-color: #555; }
+        button.danger { background-color: #d32f2f; }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            background-color: #1e1e1e;
+            color: #9cdcfe; /* Cor de código Java */
+            border: 1px solid #444;
+            padding: 10px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            resize: vertical;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-top: auto;
+        }
     </style>
 </head>
 <body>
+
     <div id="canvas-container">
         <canvas id="fieldCanvas" width="600" height="600"></canvas>
     </div>
-    
+
     <div id="sidebar">
-        <h2>HarriPath <span class="version">v3.0</span></h2>
+        <h1>HarriPath Planner</h1>
 
         <div class="control-group">
-            <h4>Ferramenta Atual</h4>
-            <select id="toolSelect" onchange="updateToolUI()">
-                <option value="point">📍 Ponto Manual (Add)</option>
-                <option value="obstacle">🧱 Obstáculo (Block/Unblock)</option>
-                <option value="curve">↪️ Curva Geométrica</option>
-                <option value="pathfind">🤖 Pathfinding (A*)</option>
-            </select>
-            <p id="toolDesc" style="font-size: 0.8rem; color: #888; margin: 5px 0;">Clique para adicionar pontos ao caminho.</p>
+            <label>Grade (N x N):</label>
+            <input type="number" id="gridSize" value="10" min="2" max="20">
+            <button class="secondary" onclick="resetGrid()">Atualizar</button>
         </div>
 
-        <div id="curvePanel" class="control-group hidden" style="border-left-color: #e040fb;">
-            <h4>Parâmetros da Curva</h4>
-            <label>Raio (polegadas)</label>
-            <input type="number" id="curveRadius" value="24">
-            <div class="btn-row">
-                <div><label>Início (Graus)</label><input type="number" id="curveStart" value="0"></div>
-                <div><label>Fim (Graus)</label><input type="number" id="curveEnd" value="90"></div>
-            </div>
-            <label>Passo (Suavidade)</label>
-            <input type="number" id="curveStep" value="5">
-            <small style="color:#aaa; display:block; margin-top:5px;">Clique no grid para definir o CENTRO.</small>
+        <div class="control-group">
+            <button class="secondary" onclick="undoLast()">Desfazer Último</button>
+            <button class="danger" onclick="clearPath()">Limpar Tudo</button>
         </div>
 
-        <div class="btn-row">
-            <button class="secondary" onclick="undo()">↩ Desfazer</button>
-            <button class="red" onclick="clearAll()">🗑 Limpar</button>
-        </div>
+        <h3>Código Java Gerado</h3>
+        <p style="font-size: 0.8rem; color:#888;">Cole isso dentro do seu <code>runOpMode()</code>:</p>
+        <textarea id="outputCode" readonly></textarea>
+        <button onclick="copyToClipboard()">Copiar Código</button>
 
-        <div class="info-bar">
-            <div>Mouse X: <span id="mouseX" class="info-val">0.0</span></div>
-            <div>Mouse Y: <span id="mouseY" class="info-val">0.0</span></div>
-            <div>Tile ID: <span id="tileID" class="info-val">-</span></div>
-        </div>
-
-        <div style="margin-top: auto; padding-top: 15px; border-top: 1px solid #333;">
-            <label>Código Java Gerado:</label>
-            <textarea id="outputCode" readonly></textarea>
-            <button onclick="copyCode()" style="width:100%; margin-top:5px;">📋 Copiar Código</button>
+        <div class="stats">
+            <p>Posição Mouse: <span id="mousePos">-</span></p>
+            <p>ID Quadrado: <span id="tileId">-</span></p>
         </div>
     </div>
 
     <script>
-        // --- CONFIGURAÇÕES DO ROBÔ/CAMPO ---
-        const FIELD_SIZE = 144; // Polegadas (Campo FTC padrão)
-        const CANVAS_SIZE = 600;
-        const GRID_RES = 10; // Resolução da grade (10x10, 20x20, etc)
+        // ================= CONFIGURAÇÕES =================
+        const FIELD_SIZE_INCHES = 144; // Tamanho real FTC
+        const CANVAS_SIZE = 600;       // Tamanho na tela (pixels)
         
-        // --- ESTADO DA APLICAÇÃO ---
-        let startPos = { x: 0, y: 0, set: false };
-        let obstacles = new Set(); // Armazena IDs bloqueados
-        let commands = []; // Histórico de comandos para gerar código e desenhar
-        // Tipos de comando: 
-        // { type: 'point', id: 123 }
-        // { type: 'obstacle', id: 123, wasBlocked: boolean }
-        // { type: 'curve', centerX: 0, centerY: 0, r: 10, start: 0, end: 90, step: 5, generatedIds: [] }
-        // { type: 'pathfind', startId: 1, endId: 50 }
-
-        // Elementos DOM
+        let GRID_ROWS = 10;
+        let GRID_COLS = 10;
+        
+        // Estado
+        let path = []; // Lista de IDs
+        
+        // Elementos
         const canvas = document.getElementById('fieldCanvas');
         const ctx = canvas.getContext('2d');
-        const toolSelect = document.getElementById('toolSelect');
+        const output = document.getElementById('outputCode');
+        const mouseInfo = document.getElementById('mousePos');
+        const tileInfo = document.getElementById('tileId');
+
+        // ================= LÓGICA CORE (Igual ao Java) =================
         
         // Inicialização
         function init() {
-            canvas.addEventListener('mousemove', onMove);
-            canvas.addEventListener('mousedown', onClick);
-            canvas.addEventListener('contextmenu', e => e.preventDefault());
-            document.addEventListener('keydown', e => { if(e.ctrlKey && e.key === 'z') undo(); });
+            canvas.width = CANVAS_SIZE;
+            canvas.height = CANVAS_SIZE;
             
-            updateToolUI();
+            // Event Listeners
+            canvas.addEventListener('mousemove', onMouseMove);
+            canvas.addEventListener('click', onMouseClick);
+            
             draw();
-            generateCode();
+            updateCode();
         }
 
-        // --- LÓGICA DE DESENHO (Canvas) ---
+        // Função principal de desenho
         function draw() {
+            // 1. Limpar
             ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-            
-            let tileW = CANVAS_SIZE / GRID_RES;
-            
-            // 1. Desenhar Grade e Obstáculos
-            ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = '10px Arial';
-            
-            for (let r = 0; r < GRID_RES; r++) {
-                for (let c = 0; c < GRID_RES; c++) {
-                    let javaRow = (GRID_RES - 1) - r;
-                    let id = (javaRow * GRID_RES) + c + 1;
-                    
+
+            // 2. Desenhar Grade
+            const tileW = CANVAS_SIZE / GRID_COLS;
+            const tileH = CANVAS_SIZE / GRID_ROWS;
+
+            ctx.strokeStyle = '#444';
+            ctx.lineWidth = 1;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = '10px Arial';
+
+            for (let r = 0; r < GRID_ROWS; r++) {
+                for (let c = 0; c < GRID_COLS; c++) {
                     let x = c * tileW;
-                    let y = r * tileW;
+                    let y = r * tileH;
 
-                    // Obstáculos
-                    if (obstacles.has(id)) {
-                        ctx.fillStyle = 'rgba(211, 47, 47, 0.3)';
-                        ctx.fillRect(x, y, tileW, tileW);
-                        ctx.strokeStyle = '#d32f2f';
-                    } else {
-                        ctx.strokeStyle = '#333';
-                    }
-                    
-                    ctx.lineWidth = 1;
-                    ctx.strokeRect(x, y, tileW, tileW);
-                    
-                    // ID (Discreto)
-                    ctx.fillStyle = obstacles.has(id) ? '#ff8a80' : '#444';
-                    ctx.fillText(id, x + tileW/2, y + tileW/2);
+                    // Desenhar quadrado
+                    ctx.strokeRect(x, y, tileW, tileH);
+
+                    // Calcular ID (Lógica HarriGrid.java: começa embaixo)
+                    // No Canvas, y=0 é o topo. No Java HarriGrid, row 0 é o fundo.
+                    // Temos que inverter a linha para calcular o ID visualmente correto.
+                    let javaRow = (GRID_ROWS - 1) - r;
+                    let id = (javaRow * GRID_COLS) + c + 1;
+
+                    // Desenhar número do ID bem clarinho
+                    ctx.fillStyle = '#555';
+                    ctx.fillText(id, x + tileW/2, y + tileH/2);
                 }
             }
 
-            // 2. Desenhar Caminho (Baseado no histórico de comandos)
-            let pathPoints = []; // Lista de coordenadas {x, y} para desenhar a linha verde
+            // 3. Desenhar Eixos (Centro da Arena)
+            ctx.strokeStyle = '#007acc';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(CANVAS_SIZE/2, 0); ctx.lineTo(CANVAS_SIZE/2, CANVAS_SIZE); // Y
+            ctx.moveTo(0, CANVAS_SIZE/2); ctx.lineTo(CANVAS_SIZE, CANVAS_SIZE/2); // X
+            ctx.stroke();
 
-            // Adicionar Ponto Inicial
-            if (startPos.set) {
-                let s = worldToCanvas(startPos.x, startPos.y);
-                pathPoints.push(s);
-                
-                // Desenhar Start
-                ctx.fillStyle = '#00afff';
-                ctx.beginPath(); ctx.arc(s.x, s.y, 6, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = 'white'; ctx.font = 'bold 12px Arial'; ctx.fillText("START", s.x, s.y - 10);
-            }
-
-            // Processar Comandos para Visualização
-            commands.forEach(cmd => {
-                if (cmd.type === 'point') {
-                    pathPoints.push(getTileCenterCanvas(cmd.id));
-                } 
-                else if (cmd.type === 'curve') {
-                    // Desenha os pontos gerados pela curva
-                    cmd.generatedIds.forEach(id => {
-                        pathPoints.push(getTileCenterCanvas(id));
-                    });
-                }
-                else if (cmd.type === 'pathfind') {
-                    // Visualmente desenhamos uma linha tracejada direta
-                    // (Implementar A* em JS visualmente seria legal, mas complexo. 
-                    //  Aqui mostramos a intenção de movimento)
-                    pathPoints.push(getTileCenterCanvas(cmd.endId));
-                }
-            });
-
-            // Desenhar Linha Conectora
-            if (pathPoints.length > 0) {
+            // 4. Desenhar Caminho
+            if (path.length > 0) {
                 ctx.beginPath();
                 ctx.strokeStyle = '#4caf50';
                 ctx.lineWidth = 3;
-                ctx.lineCap = 'round';
                 ctx.lineJoin = 'round';
 
-                ctx.moveTo(pathPoints[0].x, pathPoints[0].y);
-                for(let i=1; i<pathPoints.length; i++) {
-                    ctx.lineTo(pathPoints[i].x, pathPoints[i].y);
+                for (let i = 0; i < path.length; i++) {
+                    let center = getCanvasCenterFromID(path[i]);
+                    if (i === 0) ctx.moveTo(center.x, center.y);
+                    else ctx.lineTo(center.x, center.y);
+                    
+                    // Desenhar ponto
+                    drawCircle(center.x, center.y, 4, '#fff');
                 }
                 ctx.stroke();
-
-                // Desenhar "bolinhas" nos waypoints
-                ctx.fillStyle = '#66bb6a';
-                pathPoints.forEach(p => {
-                    ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI*2); ctx.fill();
-                });
             }
         }
 
-        // --- INTERAÇÃO DO USUÁRIO ---
-        function onClick(e) {
-            e.preventDefault();
-            const rect = canvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
-            const info = getInfoFromCanvas(mouseX, mouseY);
-            const tool = toolSelect.value;
+        // ================= MATEMÁTICA =================
 
-            // Botão Direito: Sempre define Start Position
-            if (e.button === 2) {
-                startPos = { x: info.realX, y: info.realY, set: true };
-                draw(); generateCode();
-                return;
-            }
+        // Converte ID (1..100) para coordenadas do Canvas (pixels)
+        function getCanvasCenterFromID(id) {
+            let adjustedId = id - 1;
+            let javaRow = Math.floor(adjustedId / GRID_COLS);
+            let col = adjustedId % GRID_COLS;
 
-            // Botão Esquerdo: Depende da Ferramenta
-            if (tool === 'obstacle') {
-                if (obstacles.has(info.id)) {
-                    obstacles.delete(info.id);
-                    // Não salvamos remoção no histórico visual, apenas estado
-                } else {
-                    obstacles.add(info.id);
-                }
-                // Adicionamos um comando especial "config" se quiser desfazer? 
-                // Para simplificar, obstáculos não entram na pilha de "undo" do caminho, 
-                // mas você pode clicar de novo para remover.
-            } 
-            else if (tool === 'point') {
-                commands.push({ type: 'point', id: info.id });
-            }
-            else if (tool === 'curve') {
-                addCurveLogic(info.realX, info.realY);
-            }
-            else if (tool === 'pathfind') {
-                // Se o ultimo comando foi um ponto, usa ele como start, senão usa StartPos
-                let lastId = getLastTileId();
-                if (lastId === -1 && !startPos.set) {
-                    alert("Defina uma posição inicial (Botão Direito) ou adicione um ponto antes!");
-                    return;
-                }
-                // Se não tem pontos no path, tenta pegar o ID da startPos
-                if (lastId === -1) {
-                    lastId = getTileIdAt(startPos.x, startPos.y);
-                }
-                
-                commands.push({ type: 'pathfind', startId: lastId, endId: info.id });
-            }
+            // Inverter linha para canvas
+            let canvasRow = (GRID_ROWS - 1) - javaRow;
 
-            draw();
-            generateCode();
-        }
+            let tileW = CANVAS_SIZE / GRID_COLS;
+            let tileH = CANVAS_SIZE / GRID_ROWS;
 
-        function undo() {
-            commands.pop();
-            draw();
-            generateCode();
-        }
-
-        function clearAll() {
-            commands = [];
-            obstacles.clear();
-            startPos.set = false;
-            draw();
-            generateCode();
-        }
-
-        // --- LÓGICA MATEMÁTICA (SIMULANDO O JAVA) ---
-
-        // Adiciona curva ao histórico simulando a matemática do HarriPath.java
-        function addCurveLogic(centerX, centerY) {
-            let r = parseFloat(document.getElementById('curveRadius').value);
-            let start = parseFloat(document.getElementById('curveStart').value);
-            let end = parseFloat(document.getElementById('curveEnd').value);
-            let step = parseFloat(document.getElementById('curveStep').value);
-
-            let generatedIds = [];
-            let currentAngle = start;
-            let clockwise = end < start;
-            step = Math.abs(step);
-
-            // Simulação do loop Java
-            while ((clockwise && currentAngle > end) || (!clockwise && currentAngle < end)) {
-                let rad = currentAngle * (Math.PI / 180.0);
-                let x = centerX + r * Math.cos(rad);
-                let y = centerY + r * Math.sin(rad);
-                
-                let id = getTileIdAt(x, y);
-                // Evita duplicatas sequenciais
-                if (generatedIds.length === 0 || generatedIds[generatedIds.length-1] !== id) {
-                    if (id >= 1 && id <= GRID_RES*GRID_RES) generatedIds.push(id);
-                }
-
-                if (clockwise) currentAngle -= step;
-                else currentAngle += step;
-            }
-
-            commands.push({
-                type: 'curve',
-                centerX: centerX, centerY: centerY, radius: r, start: start, end: end, step: step,
-                generatedIds: generatedIds
-            });
-        }
-
-        function getTileIdAt(x, y) {
-            let tileW = FIELD_SIZE / GRID_RES;
-            // Shift para 0..144
-            let sx = Math.max(0, Math.min(FIELD_SIZE - 0.1, x + (FIELD_SIZE/2.0)));
-            let sy = Math.max(0, Math.min(FIELD_SIZE - 0.1, y + (FIELD_SIZE/2.0)));
-            
-            let col = Math.floor(sx / tileW);
-            let row = Math.floor(sy / tileW);
-            return (row * GRID_RES) + col + 1;
-        }
-
-        // --- UTILITÁRIOS DE UI ---
-        function updateToolUI() {
-            const tool = toolSelect.value;
-            const desc = document.getElementById('toolDesc');
-            const curvePanel = document.getElementById('curvePanel');
-            
-            curvePanel.classList.add('hidden');
-
-            if (tool === 'point') desc.innerText = "Clique esquerdo: Adiciona quadrado ao caminho.";
-            else if (tool === 'obstacle') desc.innerText = "Clique esquerdo: Bloqueia/Desbloqueia quadrado.";
-            else if (tool === 'curve') {
-                desc.innerText = "Configure abaixo e clique no grid para definir o CENTRO.";
-                curvePanel.classList.remove('hidden');
-            }
-            else if (tool === 'pathfind') desc.innerText = "Clique no destino. O robô calculará a rota desviando de obstáculos.";
-        }
-
-        function onMove(e) {
-            const rect = canvas.getBoundingClientRect();
-            const info = getInfoFromCanvas(e.clientX - rect.left, e.clientY - rect.top);
-            document.getElementById('mouseX').innerText = info.realX.toFixed(1);
-            document.getElementById('mouseY').innerText = info.realY.toFixed(1);
-            document.getElementById('tileID').innerText = info.id;
-        }
-
-        // --- CONVERSORES DE COORDENADAS ---
-        function getInfoFromCanvas(mx, my) {
-            // Canvas (0..600) -> Real (-72..72)
-            let realX = (mx / CANVAS_SIZE) * FIELD_SIZE - (FIELD_SIZE/2);
-            let realY = -((my / CANVAS_SIZE) * FIELD_SIZE - (FIELD_SIZE/2)); // Y invertido no Canvas
-
-            // ID Calc
-            let step = CANVAS_SIZE / GRID_RES;
-            let c = Math.floor(mx / step);
-            let r = Math.floor(my / step);
-            if(c>=GRID_RES) c=GRID_RES-1; if(r>=GRID_RES) r=GRID_RES-1;
-            
-            let javaRow = (GRID_RES-1)-r;
-            let id = (javaRow * GRID_RES) + c + 1;
-
-            return { realX, realY, id };
-        }
-
-        function getTileCenterCanvas(id) {
-            let adj = id - 1;
-            let r = Math.floor(adj / GRID_RES); // Row Java (0 embaixo)
-            let c = adj % GRID_RES;
-            
-            let canvasRow = (GRID_RES - 1) - r; // Row Canvas (0 em cima)
-            let step = CANVAS_SIZE / GRID_RES;
-            
-            return { 
-                x: c * step + step/2, 
-                y: canvasRow * step + step/2 
+            return {
+                x: (col * tileW) + (tileW / 2),
+                y: (canvasRow * tileH) + (tileH / 2)
             };
         }
 
-        function worldToCanvas(wx, wy) {
-            let cx = (wx + FIELD_SIZE/2) * (CANVAS_SIZE/FIELD_SIZE);
-            let cy = (-wy + FIELD_SIZE/2) * (CANVAS_SIZE/FIELD_SIZE);
-            return { x: cx, y: cy };
+        // Converte Mouse (pixels) para ID e Coordenadas Reais (polegadas)
+        function getInfoFromMouse(mx, my) {
+            let tileW = CANVAS_SIZE / GRID_COLS;
+            let tileH = CANVAS_SIZE / GRID_ROWS;
+
+            let col = Math.floor(mx / tileW);
+            let canvasRow = Math.floor(my / tileH);
+
+            // Proteção contra sair da borda
+            if(col >= GRID_COLS) col = GRID_COLS - 1;
+            if(canvasRow >= GRID_ROWS) canvasRow = GRID_ROWS - 1;
+
+            // Converter para Java Row
+            let javaRow = (GRID_ROWS - 1) - canvasRow;
+            let id = (javaRow * GRID_COLS) + col + 1;
+
+            // Calcular X/Y em polegadas (Centro 0,0)
+            // X = (mx / total) * 144 - 72
+            let realX = (mx / CANVAS_SIZE) * FIELD_SIZE_INCHES - (FIELD_SIZE_INCHES/2);
+            // Y no Java cresce pra cima, no mouse cresce pra baixo. Inverter.
+            let realY = -((my / CANVAS_SIZE) * FIELD_SIZE_INCHES - (FIELD_SIZE_INCHES/2));
+
+            return { id, realX, realY };
         }
 
-        function getLastTileId() {
-            // Retorna o ID do último tile visitado (para conectar pathfinding)
-            for (let i = commands.length - 1; i >= 0; i--) {
-                let cmd = commands[i];
-                if (cmd.type === 'point') return cmd.id;
-                if (cmd.type === 'curve') return cmd.generatedIds[cmd.generatedIds.length - 1];
-                if (cmd.type === 'pathfind') return cmd.endId;
-            }
-            return -1;
-        }
+        // ================= INTERAÇÃO =================
 
-        // --- GERADOR DE CÓDIGO ---
-        function generateCode() {
-            let c = `// 1. Configuração\n`;
-            c += `HarriGrid grid = new HarriGrid(${FIELD_SIZE}, ${GRID_RES});\n`;
-            c += `HarriPath path = new HarriPath(grid);\n\n`;
+        function onMouseMove(e) {
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
 
-            if (obstacles.size > 0) {
-                c += `// Obstáculos definidos\n`;
-                // Agrupar para ficar bonito
-                let obsArray = Array.from(obstacles).sort((a,b)=>a-b);
-                obsArray.forEach(id => {
-                    c += `grid.addObstacle(${id}); `;
-                });
-                c += `\n\n`;
-            }
-
-            if (startPos.set) {
-                c += `// Posição Inicial\n`;
-                c += `odometry.setPosition(${startPos.x.toFixed(1)}, ${startPos.y.toFixed(1)}, 0);\n\n`;
-            } else {
-                c += `// AVISO: Clique Botão Direito para definir Start!\n\n`;
-            }
-
-            c += `// 2. Construção da Rota\n`;
+            const info = getInfoFromMouse(mx, my);
             
-            commands.forEach(cmd => {
-                if (cmd.type === 'point') {
-                    c += `path.add(${cmd.id});\n`;
-                }
-                else if (cmd.type === 'curve') {
-                    c += `path.addCurve(${cmd.centerX.toFixed(1)}, ${cmd.centerY.toFixed(1)}, ${cmd.radius}, ${cmd.start}, ${cmd.end}, ${cmd.step});\n`;
-                }
-                else if (cmd.type === 'pathfind') {
-                    c += `// Pathfind de ${cmd.startId} até ${cmd.endId}\n`;
-                    c += `path.makePath(${cmd.startId}, ${cmd.endId});\n`;
-                }
+            mouseInfo.textContent = `X: ${info.realX.toFixed(1)}, Y: ${info.realY.toFixed(1)}`;
+            tileInfo.textContent = info.id;
+        }
+
+        function onMouseClick(e) {
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            
+            const info = getInfoFromMouse(mx, my);
+            
+            // Adicionar ao caminho
+            path.push(info.id);
+            
+            draw();
+            updateCode();
+        }
+
+        // ================= CONTROLES UI =================
+
+        function updateCode() {
+            if (path.length === 0) {
+                output.value = "// Clique na grade para gerar o caminho...";
+                return;
+            }
+
+            let code = `// Inicializa\n`;
+            code += `HarriGrid grid = new HarriGrid(144, ${GRID_ROWS});\n`;
+            code += `HarriPath path = new HarriPath(grid);\n\n`;
+            code += `// Caminho Gerado\npath`;
+            
+            path.forEach(id => {
+                code += `.add(${id})`;
             });
+            code += `;`;
 
-            document.getElementById('outputCode').value = c;
+            output.value = code;
         }
 
-        function copyCode() {
-            document.getElementById('outputCode').select();
+        function undoLast() {
+            path.pop();
+            draw();
+            updateCode();
+        }
+
+        function clearPath() {
+            path = [];
+            draw();
+            updateCode();
+        }
+
+        function resetGrid() {
+            let val = document.getElementById('gridSize').value;
+            GRID_ROWS = parseInt(val);
+            GRID_COLS = parseInt(val);
+            path = [];
+            draw();
+            updateCode();
+        }
+        
+        function copyToClipboard() {
+            output.select();
             document.execCommand('copy');
+            alert("Código copiado!");
         }
 
+        function drawCircle(x, y, r, color) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Start
         init();
+
     </script>
 </body>
 </html>
